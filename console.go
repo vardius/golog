@@ -3,14 +3,15 @@
 package golog
 
 import (
+	"context"
 	"log"
 	"os"
-
-	"golang.org/x/net/context"
 )
 
 type (
 	consoleLogger struct {
+		verboseLevel int
+
 		debug    *log.Logger
 		info     *log.Logger
 		warning  *log.Logger
@@ -31,8 +32,9 @@ const (
 	CLR_N = "\x1b[0m"
 )
 
-func NewConsoleLogger() Logger {
+func NewConsoleLogger(verbose string) Logger {
 	return &consoleLogger{
+		parseVerboseLevel(verbose),
 		log.New(os.Stdout, CLR_0, log.Ldate|log.Ltime|log.Lmicroseconds|log.Lshortfile),
 		log.New(os.Stdout, CLR_G, log.Ldate|log.Ltime|log.Lmicroseconds|log.Lshortfile),
 		log.New(os.Stdout, CLR_Y, log.Ldate|log.Ltime|log.Lmicroseconds|log.Lshortfile),
@@ -42,19 +44,27 @@ func NewConsoleLogger() Logger {
 }
 
 func (logger *consoleLogger) Debug(ctx context.Context, format string, args ...interface{}) {
-	logger.debug.Printf("DEBUG: "+format, args...)
+	if logger.verboseLevel > DebugLevel {
+		logger.debug.Printf("DEBUG: "+format, args...)
+	}
 }
 
 func (logger *consoleLogger) Info(ctx context.Context, format string, args ...interface{}) {
-	logger.info.Printf("INFO:  "+format, args...)
+	if logger.verboseLevel > InfoLevel {
+		logger.info.Printf("INFO:  "+format, args...)
+	}
 }
 
 func (logger *consoleLogger) Warning(ctx context.Context, format string, args ...interface{}) {
-	logger.warning.Printf("WARN:  "+format, args...)
+	if logger.verboseLevel > WarningLevel {
+		logger.warning.Printf("WARN:  "+format, args...)
+	}
 }
 
 func (logger *consoleLogger) Error(ctx context.Context, format string, args ...interface{}) {
-	logger.error.Printf("ERROR: "+format, args...)
+	if logger.verboseLevel > ErrorLevel {
+		logger.error.Printf("ERROR: "+format, args...)
+	}
 }
 
 func (logger *consoleLogger) Critical(ctx context.Context, format string, args ...interface{}) {
