@@ -44,31 +44,33 @@ func NewConsoleLogger(verbose string) Logger {
 }
 
 func (logger *consoleLogger) Debug(ctx context.Context, format string, args ...interface{}) {
-	if logger.verboseLevel > DebugLevel {
+	if logger.verboseLevel >= DebugLevel {
 		logger.debug.Printf("DEBUG: "+format, args...)
 	}
 }
 
 func (logger *consoleLogger) Info(ctx context.Context, format string, args ...interface{}) {
-	if logger.verboseLevel > InfoLevel {
+	if logger.verboseLevel >= InfoLevel {
 		logger.info.Printf("INFO:  "+format, args...)
 	}
 }
 
 func (logger *consoleLogger) Warning(ctx context.Context, format string, args ...interface{}) {
-	if logger.verboseLevel > WarningLevel {
+	if logger.verboseLevel >= WarningLevel {
 		logger.warning.Printf("WARN:  "+format, args...)
 	}
 }
 
 func (logger *consoleLogger) Error(ctx context.Context, format string, args ...interface{}) {
-	if logger.verboseLevel > ErrorLevel {
+	if logger.verboseLevel >= ErrorLevel {
 		logger.error.Printf("ERROR: "+format, args...)
 	}
 }
 
 func (logger *consoleLogger) Critical(ctx context.Context, format string, args ...interface{}) {
-	logger.critical.Printf("FATAL: "+format, args...)
+	if logger.verboseLevel >= CriticalLevel {
+		logger.critical.Printf("FATAL: "+format, args...)
+	}
 }
 
 func init() {
