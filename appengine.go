@@ -19,31 +19,33 @@ func NewAppengineLogger(verbose string) Logger {
 }
 
 func (logger *appengineLogger) Debug(ctx context.Context, format string, args ...interface{}) {
-	if logger.verboseLevel > DebugLevel {
+	if logger.verboseLevel >= DebugLevel {
 		log.Debugf(ctx, format, args...)
 	}
 }
 
 func (logger *appengineLogger) Info(ctx context.Context, format string, args ...interface{}) {
-	if logger.verboseLevel > InfoLevel {
+	if logger.verboseLevel >= InfoLevel {
 		log.Infof(ctx, format, args...)
 	}
 }
 
 func (logger *appengineLogger) Warning(ctx context.Context, format string, args ...interface{}) {
-	if logger.verboseLevel > WarningLevel {
+	if logger.verboseLevel >= WarningLevel {
 		log.Warningf(ctx, format, args...)
 	}
 }
 
 func (logger *appengineLogger) Error(ctx context.Context, format string, args ...interface{}) {
-	if logger.verboseLevel > ErrorLevel {
+	if logger.verboseLevel >= ErrorLevel {
 		log.Errorf(ctx, format, args...)
 	}
 }
 
 func (logger *appengineLogger) Critical(ctx context.Context, format string, args ...interface{}) {
-	log.Criticalf(ctx, format, args...)
+	if logger.verboseLevel >= CriticalLevel {
+		log.Criticalf(ctx, format, args...)
+	}
 }
 
 func init() {
