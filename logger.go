@@ -37,6 +37,6 @@ func parseVerboseLevel(verbose string) int {
 	case "critical":
 		return CriticalLevel
 	default:
-		return 0
+		return -1 // logger disabled by default
 	}
 }
