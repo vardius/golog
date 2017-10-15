@@ -1,6 +1,7 @@
 Vardius - golog
 ================
-[![Build Status](https://travis-ci.org/vardius/golog.svg?branch=master)](https://travis-ci.org/vardius/golog) [![](https://godoc.org/github.com/vardius/golog?status.svg)](http://godoc.org/github.com/vardius/golog) [![Coverage Status](https://coveralls.io/repos/github/vardius/golog/badge.svg?branch=master)](https://coveralls.io/github/vardius/golog?branch=master)
+[![Build Status](https://travis-ci.org/vardius/golog.svg?branch=master)](https://travis-ci.org/vardius/golog)
+[![](https://godoc.org/github.com/vardius/golog?status.svg)](http://godoc.org/github.com/vardius/golog)
 
 Go logger.
 
