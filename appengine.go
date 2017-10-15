@@ -8,11 +8,9 @@ import (
 	"google.golang.org/appengine/log"
 )
 
-type (
-	appengineLogger struct {
-		verboseLevel int
-	}
-)
+type appengineLogger struct {
+	verboseLevel int
+}
 
 func NewAppengineLogger(verbose string) Logger {
 	return &appengineLogger{parseVerboseLevel(verbose)}
