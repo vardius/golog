@@ -8,18 +8,14 @@ import (
 	"os"
 )
 
-type (
-	consoleLogger struct {
-		verboseLevel int
+type consoleLogger struct {
+	verboseLevel int
+	
+	debug, info, warning, error, critical *log.Logger
+}
 
-		debug    *log.Logger
-		info     *log.Logger
-		warning  *log.Logger
-		error    *log.Logger
-		critical *log.Logger
-	}
-)
 
+// Terminal colours.
 const (
 	CLR_0 = "\x1b[30;1m"
 	CLR_R = "\x1b[31;1m"
@@ -32,6 +28,7 @@ const (
 	CLR_N = "\x1b[0m"
 )
 
+// NewConsoleLogger returns a Logger that writes to the console.
 func NewConsoleLogger(verbose string) Logger {
 	return &consoleLogger{
 		parseVerboseLevel(verbose),
