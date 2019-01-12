@@ -20,14 +20,6 @@ type (
 	}
 )
 
-const (
-	DEBUG = "DEBUG: "
-	INFO  = "INFO: "
-	WARN  = "WARN: "
-	ERROR = "ERROR: "
-	FATAL = "FATAL: "
-)
-
 func NewFileLogger(verbose, filePath string) Logger {
 	file, err := os.OpenFile(filePath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 	if err != nil {
@@ -36,12 +28,20 @@ func NewFileLogger(verbose, filePath string) Logger {
 
 	return &fileLogger{
 		parseVerboseLevel(verbose),
-		log.New(file, DEBUG, log.Ldate|log.Ltime|log.Lmicroseconds),
-		log.New(file, INFO, log.Ldate|log.Ltime|log.Lmicroseconds),
-		log.New(file, WARN, log.Ldate|log.Ltime|log.Lmicroseconds),
-		log.New(file, ERROR, log.Ldate|log.Ltime|log.Lmicroseconds),
-		log.New(file, FATAL, log.Ldate|log.Ltime|log.Lmicroseconds),
+		log.New(file, DebugPrefix, DefaultFlags),
+		log.New(file, InfoPrefix, DefaultFlags),
+		log.New(file, WarnPrefix, DefaultFlags),
+		log.New(file, ErrorPrefix, DefaultFlags),
+		log.New(file, FatalPrefix, DefaultFlags),
 	}
+}
+
+func (logger *fileLogger) SetFlags(flag int) {
+	logger.debug.SetFlags(flag)
+	logger.info.SetFlags(flag)
+	logger.warning.SetFlags(flag)
+	logger.error.SetFlags(flag)
+	logger.critical.SetFlags(flag)
 }
 
 func (logger *fileLogger) Debug(ctx context.Context, format string, args ...interface{}) {

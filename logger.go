@@ -2,13 +2,24 @@ package golog
 
 import (
 	"context"
+	"log"
 )
 
-const DebugLevel = 4
-const InfoLevel = 3
-const WarningLevel = 2
-const ErrorLevel = 1
-const CriticalLevel = 0
+const (
+	DebugPrefix = "DEBUG: "
+	InfoPrefix  = "INFO: "
+	WarnPrefix  = "WARN: "
+	ErrorPrefix = "ERROR: "
+	FatalPrefix = "FATAL: "
+
+	DebugLevel    = 4
+	InfoLevel     = 3
+	WarningLevel  = 2
+	ErrorLevel    = 1
+	CriticalLevel = 0
+
+	DefaultFlags = log.Ldate | log.Ltime | log.Lmicroseconds | log.LUTC
+)
 
 type (
 	Logger interface {

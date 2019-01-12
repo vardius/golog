@@ -10,10 +10,9 @@ import (
 
 type consoleLogger struct {
 	verboseLevel int
-	
+
 	debug, info, warning, error, critical *log.Logger
 }
-
 
 // Terminal colours.
 const (
@@ -32,41 +31,49 @@ const (
 func NewConsoleLogger(verbose string) Logger {
 	return &consoleLogger{
 		parseVerboseLevel(verbose),
-		log.New(os.Stdout, CLR_0, log.Ldate|log.Ltime|log.Lmicroseconds),
-		log.New(os.Stdout, CLR_G, log.Ldate|log.Ltime|log.Lmicroseconds),
-		log.New(os.Stdout, CLR_Y, log.Ldate|log.Ltime|log.Lmicroseconds),
-		log.New(os.Stdout, CLR_R, log.Ldate|log.Ltime|log.Lmicroseconds),
-		log.New(os.Stdout, CLR_C, log.Ldate|log.Ltime|log.Lmicroseconds),
+		log.New(os.Stdout, CLR_0+DebugPrefix, DefaultFlags),
+		log.New(os.Stdout, CLR_G+InfoPrefix, DefaultFlags),
+		log.New(os.Stdout, CLR_Y+WarnPrefix, DefaultFlags),
+		log.New(os.Stdout, CLR_R+ErrorPrefix, DefaultFlags),
+		log.New(os.Stdout, CLR_C+FatalPrefix, DefaultFlags),
 	}
+}
+
+func (logger *consoleLogger) SetFlags(flag int) {
+	logger.debug.SetFlags(flag)
+	logger.info.SetFlags(flag)
+	logger.warning.SetFlags(flag)
+	logger.error.SetFlags(flag)
+	logger.critical.SetFlags(flag)
 }
 
 func (logger *consoleLogger) Debug(ctx context.Context, format string, args ...interface{}) {
 	if logger.verboseLevel >= DebugLevel {
-		logger.debug.Printf("DEBUG: "+format, args...)
+		logger.debug.Printf(format, args...)
 	}
 }
 
 func (logger *consoleLogger) Info(ctx context.Context, format string, args ...interface{}) {
 	if logger.verboseLevel >= InfoLevel {
-		logger.info.Printf("INFO:  "+format, args...)
+		logger.info.Printf(format, args...)
 	}
 }
 
 func (logger *consoleLogger) Warning(ctx context.Context, format string, args ...interface{}) {
 	if logger.verboseLevel >= WarningLevel {
-		logger.warning.Printf("WARN:  "+format, args...)
+		logger.warning.Printf(format, args...)
 	}
 }
 
 func (logger *consoleLogger) Error(ctx context.Context, format string, args ...interface{}) {
 	if logger.verboseLevel >= ErrorLevel {
-		logger.error.Printf("ERROR: "+format, args...)
+		logger.error.Printf(format, args...)
 	}
 }
 
 func (logger *consoleLogger) Critical(ctx context.Context, format string, args ...interface{}) {
 	if logger.verboseLevel >= CriticalLevel {
-		logger.critical.Printf("FATAL: "+format, args...)
+		logger.critical.Printf(format, args...)
 	}
 }
 
