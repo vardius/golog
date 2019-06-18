@@ -6,6 +6,17 @@ import (
 	"github.com/vardius/golog"
 )
 
+func ExampleNewConsoleLogger() {
+	ctx := context.Background()
+	log := golog.NewConsoleLogger(Warning)
+
+	// log.Info won't print to the console because it is below loglevel "warn"
+	log.Info(ctx, "%s", "Info")
+	// log.Warning and log.Error will both get printed
+	log.Warning(ctx, "%s %d", "Warn", 1)
+	log.Error(ctx, "%s %d", "Error", 666)
+}
+
 func ExampleDebug() {
     ctx := context.Background()
 	logger := golog.New(golog.Debug)
