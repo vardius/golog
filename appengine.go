@@ -9,39 +9,39 @@ import (
 )
 
 type appengineLogger struct {
-	verboseLevel int
+	verboseLevel Verbose
 }
 
-func NewAppengineLogger(verbose string) Logger {
-	return &appengineLogger{parseVerboseLevel(verbose)}
+func NewAppengineLogger(level Verbose) Logger {
+	return &appengineLogger{level}
 }
 
 func (logger *appengineLogger) Debug(ctx context.Context, format string, args ...interface{}) {
-	if logger.verboseLevel >= DebugLevel {
+	if logger.verboseLevel >= Debug {
 		log.Debugf(ctx, format, args...)
 	}
 }
 
 func (logger *appengineLogger) Info(ctx context.Context, format string, args ...interface{}) {
-	if logger.verboseLevel >= InfoLevel {
+	if logger.verboseLevel >= Info {
 		log.Infof(ctx, format, args...)
 	}
 }
 
 func (logger *appengineLogger) Warning(ctx context.Context, format string, args ...interface{}) {
-	if logger.verboseLevel >= WarningLevel {
+	if logger.verboseLevel >= Warning {
 		log.Warningf(ctx, format, args...)
 	}
 }
 
 func (logger *appengineLogger) Error(ctx context.Context, format string, args ...interface{}) {
-	if logger.verboseLevel >= ErrorLevel {
+	if logger.verboseLevel >= Error {
 		log.Errorf(ctx, format, args...)
 	}
 }
 
 func (logger *appengineLogger) Critical(ctx context.Context, format string, args ...interface{}) {
-	if logger.verboseLevel >= CriticalLevel {
+	if logger.verboseLevel >= Critical {
 		log.Criticalf(ctx, format, args...)
 	}
 }

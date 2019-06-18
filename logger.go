@@ -5,6 +5,8 @@ import (
 	"log"
 )
 
+type Verbose int
+
 const (
 	DebugPrefix = "DEBUG: "
 	InfoPrefix  = "INFO: "
@@ -12,13 +14,14 @@ const (
 	ErrorPrefix = "ERROR: "
 	FatalPrefix = "FATAL: "
 
-	DebugLevel    = 4
-	InfoLevel     = 3
-	WarningLevel  = 2
-	ErrorLevel    = 1
-	CriticalLevel = 0
-
 	DefaultFlags = log.Ldate | log.Ltime | log.Lmicroseconds | log.LUTC
+
+	Disabled Verbose = -1
+	Critical Verbose = iota
+	Error
+	Warning
+	Info
+	Debug
 )
 
 type (
@@ -30,24 +33,7 @@ type (
 		Critical(ctx context.Context, format string, args ...interface{})
 	}
 
-	loggerFactory func(verbose string) Logger
+	loggerFactory func(level Verbose) Logger
 )
 
 var New loggerFactory
-
-func parseVerboseLevel(verbose string) int {
-	switch verbose {
-	case "debug":
-		return DebugLevel
-	case "info":
-		return InfoLevel
-	case "warning":
-		return WarningLevel
-	case "error":
-		return ErrorLevel
-	case "critical":
-		return CriticalLevel
-	default:
-		return -1 // logger disabled by default
-	}
-}

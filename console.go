@@ -9,7 +9,7 @@ import (
 )
 
 type consoleLogger struct {
-	verboseLevel int
+	verboseLevel Verbose
 
 	debug, info, warning, error, critical *log.Logger
 }
@@ -28,9 +28,9 @@ const (
 )
 
 // NewConsoleLogger returns a Logger that writes to the console.
-func NewConsoleLogger(verbose string) Logger {
+func NewConsoleLogger(level Verbose) Logger {
 	return &consoleLogger{
-		parseVerboseLevel(verbose),
+		level,
 		log.New(os.Stdout, CLR_0+DebugPrefix, DefaultFlags),
 		log.New(os.Stdout, CLR_G+InfoPrefix, DefaultFlags),
 		log.New(os.Stdout, CLR_Y+WarnPrefix, DefaultFlags),
@@ -48,31 +48,31 @@ func (logger *consoleLogger) SetFlags(flag int) {
 }
 
 func (logger *consoleLogger) Debug(ctx context.Context, format string, args ...interface{}) {
-	if logger.verboseLevel >= DebugLevel {
+	if logger.verboseLevel >= Debug {
 		logger.debug.Printf(format, args...)
 	}
 }
 
 func (logger *consoleLogger) Info(ctx context.Context, format string, args ...interface{}) {
-	if logger.verboseLevel >= InfoLevel {
+	if logger.verboseLevel >= Info {
 		logger.info.Printf(format, args...)
 	}
 }
 
 func (logger *consoleLogger) Warning(ctx context.Context, format string, args ...interface{}) {
-	if logger.verboseLevel >= WarningLevel {
+	if logger.verboseLevel >= Warning {
 		logger.warning.Printf(format, args...)
 	}
 }
 
 func (logger *consoleLogger) Error(ctx context.Context, format string, args ...interface{}) {
-	if logger.verboseLevel >= ErrorLevel {
+	if logger.verboseLevel >= Error {
 		logger.error.Printf(format, args...)
 	}
 }
 
 func (logger *consoleLogger) Critical(ctx context.Context, format string, args ...interface{}) {
-	if logger.verboseLevel >= CriticalLevel {
+	if logger.verboseLevel >= Critical {
 		logger.critical.Printf(format, args...)
 	}
 }

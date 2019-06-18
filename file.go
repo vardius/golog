@@ -10,7 +10,7 @@ import (
 
 type (
 	fileLogger struct {
-		verboseLevel int
+		verboseLevel Verbose
 
 		debug    *log.Logger
 		info     *log.Logger
@@ -20,14 +20,14 @@ type (
 	}
 )
 
-func NewFileLogger(verbose, filePath string) Logger {
+func NewFileLogger(level Verbose, filePath string) Logger {
 	file, err := os.OpenFile(filePath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 	if err != nil {
 		return nil
 	}
 
 	return &fileLogger{
-		parseVerboseLevel(verbose),
+		level,
 		log.New(file, DebugPrefix, DefaultFlags),
 		log.New(file, InfoPrefix, DefaultFlags),
 		log.New(file, WarnPrefix, DefaultFlags),
@@ -45,31 +45,31 @@ func (logger *fileLogger) SetFlags(flag int) {
 }
 
 func (logger *fileLogger) Debug(ctx context.Context, format string, args ...interface{}) {
-	if logger.verboseLevel >= DebugLevel {
+	if logger.verboseLevel >= Debug {
 		logger.debug.Printf(format, args...)
 	}
 }
 
 func (logger *fileLogger) Info(ctx context.Context, format string, args ...interface{}) {
-	if logger.verboseLevel >= InfoLevel {
+	if logger.verboseLevel >= Info {
 		logger.info.Printf(format, args...)
 	}
 }
 
 func (logger *fileLogger) Warning(ctx context.Context, format string, args ...interface{}) {
-	if logger.verboseLevel >= WarningLevel {
+	if logger.verboseLevel >= Warning {
 		logger.warning.Printf(format, args...)
 	}
 }
 
 func (logger *fileLogger) Error(ctx context.Context, format string, args ...interface{}) {
-	if logger.verboseLevel >= ErrorLevel {
+	if logger.verboseLevel >= Error {
 		logger.error.Printf(format, args...)
 	}
 }
 
 func (logger *fileLogger) Critical(ctx context.Context, format string, args ...interface{}) {
-	if logger.verboseLevel >= CriticalLevel {
+	if logger.verboseLevel >= Critical {
 		logger.critical.Printf(format, args...)
 	}
 }

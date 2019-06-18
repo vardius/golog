@@ -1,11 +1,14 @@
 package golog_test
 
-import "github.com/vardius/golog"
-import "context"
+import (
+	"context"
+
+	"github.com/vardius/golog"
+)
 
 func ExampleNewConsoleLogger() {
+	ctx := context.Background()
 	log := golog.NewConsoleLogger("warn")
-	ctx := context.TODO()
 
 	// log.Info won't print to the console because it is below loglevel "warn"
 	log.Info(ctx, "%s", "Info")
