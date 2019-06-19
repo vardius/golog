@@ -1,14 +1,14 @@
 package golog_test
 
 import (
-    "context"
+	"context"
 
 	"github.com/vardius/golog"
 )
 
 func ExampleNewConsoleLogger() {
 	ctx := context.Background()
-	log := golog.NewConsoleLogger(Warning)
+	log := golog.NewConsoleLogger(golog.Warning)
 
 	// log.Info won't print to the console because it is below loglevel "warn"
 	log.Info(ctx, "%s", "Info")
@@ -18,7 +18,7 @@ func ExampleNewConsoleLogger() {
 }
 
 func ExampleDebug() {
-    ctx := context.Background()
+	ctx := context.Background()
 	logger := golog.New(golog.Debug)
 
 	logger.Debug(ctx, "Hello %s!", "you")
@@ -28,7 +28,7 @@ func ExampleDebug() {
 }
 
 func ExampleInfo() {
-    ctx := context.Background()
+	ctx := context.Background()
 	logger := golog.New(golog.Info)
 
 	logger.Info(ctx, "Hello %s!", "you")
@@ -38,7 +38,7 @@ func ExampleInfo() {
 }
 
 func ExampleWarning() {
-    ctx := context.Background()
+	ctx := context.Background()
 	logger := golog.New(golog.Warning)
 
 	logger.Warning(ctx, "Hello %s!", "you")
@@ -48,7 +48,7 @@ func ExampleWarning() {
 }
 
 func ExampleError() {
-    ctx := context.Background()
+	ctx := context.Background()
 	logger := golog.New(golog.Error)
 
 	logger.Error(ctx, "Hello %s!", "you")
@@ -58,7 +58,7 @@ func ExampleError() {
 }
 
 func ExampleCritical() {
-    ctx := context.Background()
+	ctx := context.Background()
 	logger := golog.New(golog.Critical)
 
 	logger.Critical(ctx, "Hello %s!", "you")
@@ -66,4 +66,3 @@ func ExampleCritical() {
 	// Output:
 	// FATAL: Hello you!
 }
-
