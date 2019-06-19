@@ -45,6 +45,9 @@ type (
 		Warning(ctx context.Context, format string, args ...interface{})
 		Error(ctx context.Context, format string, args ...interface{})
 		Critical(ctx context.Context, format string, args ...interface{})
+
+		// Override DefaultFlags value on a Logger instance
+		SetFlags(flag int)
 	}
 
 	loggerFactory func(level Verbose) Logger

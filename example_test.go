@@ -8,7 +8,7 @@ import (
 
 func ExampleNewConsoleLogger() {
 	ctx := context.Background()
-	log := golog.NewConsoleLogger(golog.Warning)
+	log := golog.New(golog.Warning)
 
 	// log.Info won't print to the console because it is below loglevel "warn"
 	log.Info(ctx, "%s", "Info")
@@ -21,6 +21,7 @@ func ExampleDebug() {
 	ctx := context.Background()
 	logger := golog.New(golog.Debug)
 
+	logger.SetFlags(0)
 	logger.Debug(ctx, "Hello %s!", "you")
 
 	// Output:
@@ -31,6 +32,7 @@ func ExampleInfo() {
 	ctx := context.Background()
 	logger := golog.New(golog.Info)
 
+	logger.SetFlags(0)
 	logger.Info(ctx, "Hello %s!", "you")
 
 	// Output:
@@ -41,6 +43,7 @@ func ExampleWarning() {
 	ctx := context.Background()
 	logger := golog.New(golog.Warning)
 
+	logger.SetFlags(0)
 	logger.Warning(ctx, "Hello %s!", "you")
 
 	// Output:
@@ -51,6 +54,7 @@ func ExampleError() {
 	ctx := context.Background()
 	logger := golog.New(golog.Error)
 
+	logger.SetFlags(0)
 	logger.Error(ctx, "Hello %s!", "you")
 
 	// Output:
@@ -61,6 +65,7 @@ func ExampleCritical() {
 	ctx := context.Background()
 	logger := golog.New(golog.Critical)
 
+	logger.SetFlags(0)
 	logger.Critical(ctx, "Hello %s!", "you")
 
 	// Output:

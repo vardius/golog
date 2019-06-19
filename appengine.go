@@ -16,6 +16,8 @@ func NewAppengineLogger(level Verbose) Logger {
 	return &appengineLogger{level}
 }
 
+func (logger *appengineLogger) SetFlags(flag int) {}
+
 func (logger *appengineLogger) Debug(ctx context.Context, format string, args ...interface{}) {
 	if logger.verboseLevel >= Debug {
 		log.Debugf(ctx, format, args...)
