@@ -58,7 +58,7 @@ func ExampleError() {
 	logger.Error(ctx, "Hello %s!", "you")
 
 	// Output:
-	// [31;1mERROR: Hello you!
+	// [31;1mERROR: Hello you!
 }
 
 func ExampleCritical() {
