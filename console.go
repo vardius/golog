@@ -31,11 +31,11 @@ const (
 func NewConsoleLogger(level Verbose) Logger {
 	return &consoleLogger{
 		level,
-		log.New(os.Stdout, CLR_0+DebugPrefix, DefaultFlags),
-		log.New(os.Stdout, CLR_G+InfoPrefix, DefaultFlags),
+		log.New(os.Stdout, CLR_W+DebugPrefix, DefaultFlags),
+		log.New(os.Stdout, CLR_C+InfoPrefix, DefaultFlags),
 		log.New(os.Stdout, CLR_Y+WarnPrefix, DefaultFlags),
 		log.New(os.Stdout, CLR_R+ErrorPrefix, DefaultFlags),
-		log.New(os.Stdout, CLR_C+FatalPrefix, DefaultFlags),
+		log.New(os.Stdout, CLR_R+FatalPrefix, DefaultFlags),
 	}
 }
 

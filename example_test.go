@@ -25,7 +25,7 @@ func ExampleDebug() {
 	logger.Debug(ctx, "Hello %s!", "you")
 
 	// Output:
-	// DEBUG: Hello you!
+	// \x1b[37;1mDEBUG: Hello you!
 }
 
 func ExampleInfo() {
@@ -36,7 +36,7 @@ func ExampleInfo() {
 	logger.Info(ctx, "Hello %s!", "you")
 
 	// Output:
-	// INFO: Hello you!
+	// \x1b[36;1mINFO: Hello you!
 }
 
 func ExampleWarning() {
@@ -47,7 +47,7 @@ func ExampleWarning() {
 	logger.Warning(ctx, "Hello %s!", "you")
 
 	// Output:
-	// WARN: Hello you!
+	// \x1b[33;1mWARN: Hello you!
 }
 
 func ExampleError() {
@@ -58,7 +58,7 @@ func ExampleError() {
 	logger.Error(ctx, "Hello %s!", "you")
 
 	// Output:
-	// ERROR: Hello you!
+	// \x1b[31;1mERROR: Hello you!
 }
 
 func ExampleCritical() {
@@ -69,5 +69,5 @@ func ExampleCritical() {
 	logger.Critical(ctx, "Hello %s!", "you")
 
 	// Output:
-	// FATAL: Hello you!
+	// \x1b[31;1mFATAL: Hello you!
 }
