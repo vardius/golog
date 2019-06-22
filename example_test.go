@@ -8,13 +8,19 @@ import (
 
 func ExampleNewConsoleLogger() {
 	ctx := context.Background()
-	log := golog.New(golog.Warning)
+	logger := golog.New(golog.Warning)
 
-	// log.Info won't print to the console because it is below loglevel "warn"
-	log.Info(ctx, "%s", "Info")
-	// log.Warning and log.Error will both get printed
-	log.Warning(ctx, "%s %d", "Warn", 1)
-	log.Error(ctx, "%s %d", "Error", 666)
+	logger.SetFlags(0)
+
+	// logger.Info won't print to the console because it is below loglevel "warn"
+	logger.Info(ctx, "%s", "Info")
+	// logger.Warning and log.Error will both get printed
+	logger.Warning(ctx, "%s %d", "Warn", 1)
+	logger.Error(ctx, "%s %d", "Error", 666)
+
+	// Output:
+	// [33;1mWARN: Warn 1
+	// [31;1mERROR: Error 666
 }
 
 func ExampleDebug() {
