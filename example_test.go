@@ -26,7 +26,7 @@ func ExampleNewConsoleLogger() {
 func ExampleNewConsoleLogger_second() {
 	ctx := context.Background()
 
-	logger := golog.NewConsoleLogger(golog.Verbose(2))
+	logger := golog.NewConsoleLogger(2)
 
 	logger.SetFlags(0)
 
