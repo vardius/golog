@@ -9,41 +9,60 @@ import (
 )
 
 type appengineLogger struct {
-	verboseLevel Verbose
+	verbosity Verbose
 }
 
-func NewAppengineLogger(level Verbose) Logger {
-	return &appengineLogger{level}
+func NewAppengineLogger() Logger {
+	return &appengineLogger{DefaultVerbosity}
 }
 
-func (logger *appengineLogger) SetFlags(flag int) {}
+func (l *appengineLogger) SetFlags(flag int) {}
 
-func (logger *appengineLogger) Debug(ctx context.Context, format string, args ...interface{}) {
-	if logger.verboseLevel >= Debug {
+func (l *appengineLogger) SetVerbosity(verbosity Verbose) {
+	l.verbosity = verbosity
+}
+
+func (l *appengineLogger) Debug(ctx context.Context, format string, args ...interface{}) {
+	if l.verbosity&Disabled != 0 {
+		return
+	}
+	if l.verbosity&Debug != 0 {
 		log.Debugf(ctx, format, args...)
 	}
 }
 
-func (logger *appengineLogger) Info(ctx context.Context, format string, args ...interface{}) {
-	if logger.verboseLevel >= Info {
+func (l *appengineLogger) Info(ctx context.Context, format string, args ...interface{}) {
+	if l.verbosity&Disabled != 0 {
+		return
+	}
+	if l.verbosity&Info != 0 {
 		log.Infof(ctx, format, args...)
 	}
 }
 
-func (logger *appengineLogger) Warning(ctx context.Context, format string, args ...interface{}) {
-	if logger.verboseLevel >= Warning {
+func (l *appengineLogger) Warning(ctx context.Context, format string, args ...interface{}) {
+	if l.verbosity&Disabled != 0 {
+		return
+	}
+	if l.verbosity&Warning != 0 {
 		log.Warningf(ctx, format, args...)
 	}
 }
 
-func (logger *appengineLogger) Error(ctx context.Context, format string, args ...interface{}) {
-	if logger.verboseLevel >= Error {
+func (l *appengineLogger) Error(ctx context.Context, format string, args ...interface{}) {
+	if l.verbosity&Disabled != 0 {
+		return
+	}
+	if l.verbosity&Error != 0 {
 		log.Errorf(ctx, format, args...)
 	}
 }
 
-func (logger *appengineLogger) Critical(ctx context.Context, format string, args ...interface{}) {
-	if logger.verboseLevel >= Critical {
+func (l *appengineLogger) Critical(ctx context.Context, format string, args ...interface{}) {
+	if l.verbosity&Disabled != 0 {
+		return
+	}
+	if l.verbosity&Critical != 0 {
 		log.Criticalf(ctx, format, args...)
 	}
 }

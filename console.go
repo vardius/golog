@@ -9,9 +9,8 @@ import (
 )
 
 type consoleLogger struct {
-	verboseLevel Verbose
-
-	debug, info, warning, error, critical *log.Logger
+	verbosity Verbose
+	logger    *log.Logger
 }
 
 // Terminal colours.
@@ -28,52 +27,63 @@ const (
 )
 
 // NewConsoleLogger returns a Logger that writes to the console.
-func NewConsoleLogger(level Verbose) Logger {
+func NewConsoleLogger() Logger {
 	return &consoleLogger{
-		level,
-		log.New(os.Stdout, CLR_W+DebugPrefix, DefaultFlags),
-		log.New(os.Stdout, CLR_C+InfoPrefix, DefaultFlags),
-		log.New(os.Stdout, CLR_Y+WarnPrefix, DefaultFlags),
-		log.New(os.Stdout, CLR_R+ErrorPrefix, DefaultFlags),
-		log.New(os.Stdout, CLR_R+FatalPrefix, DefaultFlags),
+		verbosity: DefaultVerbosity,
+		logger:    log.New(os.Stdout, "", DefaultFlags),
 	}
 }
 
-func (logger *consoleLogger) SetFlags(flag int) {
-	logger.debug.SetFlags(flag)
-	logger.info.SetFlags(flag)
-	logger.warning.SetFlags(flag)
-	logger.error.SetFlags(flag)
-	logger.critical.SetFlags(flag)
+func (l *consoleLogger) SetFlags(flag int) {
+	l.logger.SetFlags(flag)
 }
 
-func (logger *consoleLogger) Debug(ctx context.Context, format string, args ...interface{}) {
-	if logger.verboseLevel >= Debug {
-		logger.debug.Printf(format, args...)
+func (l *consoleLogger) SetVerbosity(verbosity Verbose) {
+	l.verbosity = verbosity
+}
+
+func (l *consoleLogger) Debug(ctx context.Context, format string, args ...interface{}) {
+	if l.verbosity&Disabled != 0 {
+		return
+	}
+	if l.verbosity&Debug != 0 {
+		l.logger.Printf("%s"+format, append([]interface{}{CLR_W + DebugPrefix}, args...)...)
 	}
 }
 
-func (logger *consoleLogger) Info(ctx context.Context, format string, args ...interface{}) {
-	if logger.verboseLevel >= Info {
-		logger.info.Printf(format, args...)
+func (l *consoleLogger) Info(ctx context.Context, format string, args ...interface{}) {
+	if l.verbosity&Disabled != 0 {
+		return
+	}
+	if l.verbosity&Info != 0 {
+		l.logger.Printf("%s"+format, append([]interface{}{CLR_C + InfoPrefix}, args...)...)
 	}
 }
 
-func (logger *consoleLogger) Warning(ctx context.Context, format string, args ...interface{}) {
-	if logger.verboseLevel >= Warning {
-		logger.warning.Printf(format, args...)
+func (l *consoleLogger) Warning(ctx context.Context, format string, args ...interface{}) {
+	if l.verbosity&Disabled != 0 {
+		return
+	}
+	if l.verbosity&Warning != 0 {
+		l.logger.Printf("%s"+format, append([]interface{}{CLR_Y + WarnPrefix}, args...)...)
 	}
 }
 
-func (logger *consoleLogger) Error(ctx context.Context, format string, args ...interface{}) {
-	if logger.verboseLevel >= Error {
-		logger.error.Printf(format, args...)
+func (l *consoleLogger) Error(ctx context.Context, format string, args ...interface{}) {
+	if l.verbosity&Disabled != 0 {
+		return
+	}
+	if l.verbosity&Error != 0 {
+		l.logger.Printf("%s"+format, append([]interface{}{CLR_R + ErrorPrefix}, args...)...)
 	}
 }
 
-func (logger *consoleLogger) Critical(ctx context.Context, format string, args ...interface{}) {
-	if logger.verboseLevel >= Critical {
-		logger.critical.Printf(format, args...)
+func (l *consoleLogger) Critical(ctx context.Context, format string, args ...interface{}) {
+	if l.verbosity&Disabled != 0 {
+		return
+	}
+	if l.verbosity&Critical != 0 {
+		l.logger.Printf("%s"+format, append([]interface{}{CLR_R + FatalPrefix}, args...)...)
 	}
 }
 
