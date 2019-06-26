@@ -37,7 +37,7 @@ import (
 
 func main() {
     ctx := context.Background()
-	logger := golog.New(golog.Debug)
+	logger := golog.New()
 
 	logger.Debug(ctx context.Context, "Hello %s!", "you")
 }
