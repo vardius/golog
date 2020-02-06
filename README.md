@@ -1,4 +1,4 @@
-golog
+🗒️ golog
 ================
 [![Build Status](https://travis-ci.org/vardius/golog.svg?branch=master)](https://travis-ci.org/vardius/golog)
 [![Go Report Card](https://goreportcard.com/badge/github.com/vardius/golog)](https://goreportcard.com/report/github.com/vardius/golog)
