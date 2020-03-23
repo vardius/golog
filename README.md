@@ -25,7 +25,7 @@ We are using the github [issue tracker](https://github.com/vardius/golog/issues)
 
 For __examples__ **visit [godoc#pkg-examples](http://godoc.org/github.com/vardius/golog#pkg-examples)**
 
-For **GoDoc** reference, **visit [pkg.go.dev/github.com/vardius/](https://pkg.go.dev/github.com/vardius/golog)**
+For **GoDoc** reference, **visit [pkg.go.dev](https://pkg.go.dev/github.com/vardius/golog)**
 
 🚏 HOW TO USE
 ==================================================
