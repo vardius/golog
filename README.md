@@ -3,7 +3,7 @@
 [![Build Status](https://travis-ci.org/vardius/golog.svg?branch=master)](https://travis-ci.org/vardius/golog)
 [![Go Report Card](https://goreportcard.com/badge/github.com/vardius/golog)](https://goreportcard.com/report/github.com/vardius/golog)
 [![codecov](https://codecov.io/gh/vardius/golog/branch/master/graph/badge.svg)](https://codecov.io/gh/vardius/golog)
-[![](https://godoc.org/github.com/vardius/golog?status.svg)](http://godoc.org/github.com/vardius/golog)
+[![](https://godoc.org/github.com/vardius/golog?status.svg)](https://pkg.go.dev/github.com/vardius/golog)
 [![license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/vardius/golog/blob/master/LICENSE.md)
 
 <img align="right" height="180px" src="https://github.com/vardius/gorouter/blob/master/website/src/static/img/logo.png?raw=true" alt="logo" />
@@ -25,7 +25,7 @@ We are using the github [issue tracker](https://github.com/vardius/golog/issues)
 
 For __examples__ **visit [godoc#pkg-examples](http://godoc.org/github.com/vardius/golog#pkg-examples)**
 
-For **GoDoc** reference, **visit [godoc.org](http://godoc.org/github.com/vardius/golog)**
+For **GoDoc** reference, **visit [pkg.go.dev/github.com/vardius/](https://pkg.go.dev/github.com/vardius/golog)**
 
 🚏 HOW TO USE
 ==================================================
