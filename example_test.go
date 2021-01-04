@@ -20,8 +20,8 @@ func ExampleNewConsoleLogger() {
 	logger.Error(ctx, "%s %d", "Error", 666)
 
 	// Output:
-	// [33;1mWARN: Warn 1
-	// [31;1mERROR: Error 666
+	// [33;1mWARN: Warn 1[0m
+	// [31;1mERROR: Error 666[0m
 }
 
 func ExampleNewConsoleLogger_second() {
@@ -38,8 +38,8 @@ func ExampleNewConsoleLogger_second() {
 	logger.Error(ctx, "%s %d", "Error", 666)
 
 	// Output:
-	// [33;1mWARN: Warn 1
-	// [31;1mERROR: Error 666
+	// [33;1mWARN: Warn 1[0m
+	// [31;1mERROR: Error 666[0m
 }
 
 func ExampleDebug() {
@@ -51,7 +51,7 @@ func ExampleDebug() {
 	logger.Debug(ctx, "Hello %s!", "you")
 
 	// Output:
-	// [37;1mDEBUG: Hello you!
+	// [37;1mDEBUG: Hello you![0m
 }
 
 func ExampleInfo() {
@@ -63,7 +63,7 @@ func ExampleInfo() {
 	logger.Info(ctx, "Hello %s!", "you")
 
 	// Output:
-	// [36;1mINFO: Hello you!
+	// [36;1mINFO: Hello you![0m
 }
 
 func ExampleWarning() {
@@ -75,7 +75,7 @@ func ExampleWarning() {
 	logger.Warning(ctx, "Hello %s!", "you")
 
 	// Output:
-	// [33;1mWARN: Hello you!
+	// [33;1mWARN: Hello you![0m
 }
 
 func ExampleError() {
@@ -87,7 +87,7 @@ func ExampleError() {
 	logger.Error(ctx, "Hello %s!", "you")
 
 	// Output:
-	// [31;1mERROR: Hello you!
+	// [31;1mERROR: Hello you![0m
 }
 
 func ExampleCritical() {
@@ -99,7 +99,7 @@ func ExampleCritical() {
 	logger.Critical(ctx, "Hello %s!", "you")
 
 	// Output:
-	// [31;1mFATAL: Hello you!
+	// [31;1mFATAL: Hello you![0m
 }
 
 func ExampleDisable() {
@@ -150,9 +150,9 @@ func ExampleDisable_third() {
 	logger.Critical(ctx, "Hello %s!", "you")
 
 	// Output:
-	// [37;1mDEBUG: Hello you!
-	// [36;1mINFO: Hello you!
-	// [33;1mWARN: Hello you!
-	// [31;1mERROR: Hello you!
-	// [31;1mFATAL: Hello you!
+	// [37;1mDEBUG: Hello you![0m
+	// [36;1mINFO: Hello you![0m
+	// [33;1mWARN: Hello you![0m
+	// [31;1mERROR: Hello you![0m
+	// [31;1mFATAL: Hello you![0m
 }

@@ -23,7 +23,8 @@ const (
 	CLR_M = "\x1b[35;1m"
 	CLR_C = "\x1b[36;1m"
 	CLR_W = "\x1b[37;1m"
-	CLR_N = "\x1b[0m"
+
+	RESET = "\x1b[0m"
 )
 
 // NewConsoleLogger returns a Logger that writes to the console.
@@ -47,7 +48,7 @@ func (l *consoleLogger) Debug(ctx context.Context, format string, args ...interf
 		return
 	}
 	if l.verbosity&Debug != 0 {
-		l.logger.Printf("%s"+format, append([]interface{}{CLR_W + DebugPrefix}, args...)...)
+		l.logger.Printf(CLR_W+DebugPrefix+format+RESET, args...)
 	}
 }
 
@@ -56,7 +57,7 @@ func (l *consoleLogger) Info(ctx context.Context, format string, args ...interfa
 		return
 	}
 	if l.verbosity&Info != 0 {
-		l.logger.Printf("%s"+format, append([]interface{}{CLR_C + InfoPrefix}, args...)...)
+		l.logger.Printf(CLR_C+InfoPrefix+format+RESET, args...)
 	}
 }
 
@@ -65,7 +66,7 @@ func (l *consoleLogger) Warning(ctx context.Context, format string, args ...inte
 		return
 	}
 	if l.verbosity&Warning != 0 {
-		l.logger.Printf("%s"+format, append([]interface{}{CLR_Y + WarnPrefix}, args...)...)
+		l.logger.Printf(CLR_Y+WarnPrefix+format+RESET, args...)
 	}
 }
 
@@ -74,7 +75,7 @@ func (l *consoleLogger) Error(ctx context.Context, format string, args ...interf
 		return
 	}
 	if l.verbosity&Error != 0 {
-		l.logger.Printf("%s"+format, append([]interface{}{CLR_R + ErrorPrefix}, args...)...)
+		l.logger.Printf(CLR_R+ErrorPrefix+format+RESET, args...)
 	}
 }
 
@@ -83,7 +84,7 @@ func (l *consoleLogger) Critical(ctx context.Context, format string, args ...int
 		return
 	}
 	if l.verbosity&Critical != 0 {
-		l.logger.Printf("%s"+format, append([]interface{}{CLR_R + FatalPrefix}, args...)...)
+		l.logger.Printf(CLR_R+FatalPrefix+format+RESET, args...)
 	}
 }
 
