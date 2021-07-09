@@ -43,49 +43,56 @@ func (l *consoleLogger) SetVerbosity(verbosity Verbose) {
 	l.verbosity = verbosity
 }
 
-func (l *consoleLogger) Debug(ctx context.Context, format string, args ...interface{}) {
+func (l *consoleLogger) Debug(_ context.Context, v string) {
 	if l.verbosity&Disabled != 0 {
 		return
 	}
 	if l.verbosity&Debug != 0 {
-		l.logger.Printf(CLR_W+DebugPrefix+format+RESET, args...)
+		l.logger.Printf(CLR_W+DebugPrefix+"%s"+RESET, v)
 	}
 }
 
-func (l *consoleLogger) Info(ctx context.Context, format string, args ...interface{}) {
+func (l *consoleLogger) Info(_ context.Context, v string) {
 	if l.verbosity&Disabled != 0 {
 		return
 	}
 	if l.verbosity&Info != 0 {
-		l.logger.Printf(CLR_C+InfoPrefix+format+RESET, args...)
+		l.logger.Printf(CLR_C+InfoPrefix+"%s"+RESET, v)
 	}
 }
 
-func (l *consoleLogger) Warning(ctx context.Context, format string, args ...interface{}) {
+func (l *consoleLogger) Warning(_ context.Context, v string) {
 	if l.verbosity&Disabled != 0 {
 		return
 	}
 	if l.verbosity&Warning != 0 {
-		l.logger.Printf(CLR_Y+WarnPrefix+format+RESET, args...)
+		l.logger.Printf(CLR_Y+WarnPrefix+"%s"+RESET, v)
 	}
 }
 
-func (l *consoleLogger) Error(ctx context.Context, format string, args ...interface{}) {
+func (l *consoleLogger) Error(_ context.Context, v string) {
 	if l.verbosity&Disabled != 0 {
 		return
 	}
 	if l.verbosity&Error != 0 {
-		l.logger.Printf(CLR_R+ErrorPrefix+format+RESET, args...)
+		l.logger.Printf(CLR_R+ErrorPrefix+"%s"+RESET, v)
 	}
 }
 
-func (l *consoleLogger) Critical(ctx context.Context, format string, args ...interface{}) {
+func (l *consoleLogger) Critical(_ context.Context, v string) {
 	if l.verbosity&Disabled != 0 {
 		return
 	}
 	if l.verbosity&Critical != 0 {
-		l.logger.Printf(CLR_R+FatalPrefix+format+RESET, args...)
+		l.logger.Printf(CLR_R+CriticalPrefix+"%s"+RESET, v)
 	}
+}
+
+func (l *consoleLogger) Fatal(_ context.Context, v string) {
+	if l.verbosity&Disabled == 0 {
+		l.logger.Fatalf(CLR_R+CriticalPrefix+"%s"+RESET, v)
+	}
+	os.Exit(1)
 }
 
 func init() {

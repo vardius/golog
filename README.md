@@ -35,16 +35,80 @@ For **GoDoc** reference, **visit [pkg.go.dev](https://pkg.go.dev/github.com/vard
 package main
 
 import (
+    "fmt"
     "context"
-
+    
     "github.com/vardius/golog"
 )
 
 func main() {
     ctx := context.Background()
-	logger := golog.New()
+    logger := golog.New()
+    
+    logger.Debug(ctx context.Context, fmt.Sprintf("Hello %s!", "you"))
+}
+```
 
-	logger.Debug(ctx context.Context, "Hello %s!", "you")
+## 📦 As a package
+```go
+package mylogger
+
+import (
+    "context"
+    
+    "github.com/vardius/golog"
+)
+
+var Logger golog.Logger
+
+func SetFlags(flag int) {
+    Logger.SetFlags(flag)
+}
+
+func SetVerbosity(verbosity golog.Verbose) {
+    Logger.SetVerbosity(verbosity)
+}
+
+func Debug(ctx context.Context, v string) {
+    Logger.Debug(ctx, v)
+}
+
+func Info(ctx context.Context, v string) {
+    Logger.Info(ctx, v)
+}
+
+func Warning(ctx context.Context, v string) {
+    Logger.Warning(ctx, v)
+}
+
+func Error(ctx context.Context, v string) {
+    Logger.Error(ctx, v)
+}
+
+func Critical(ctx context.Context, v string) {
+	Logger.Critical(ctx, v)
+}
+
+func Fatal(ctx context.Context, v string) {
+	Logger.Fatal(ctx, v)
+}
+
+func init() {
+    Logger = golog.New()
+}
+```
+usage:
+```go
+package main
+
+import (
+    "fmt"
+    
+    "mylogger"
+)
+
+func main() {
+    mylogger.Debug(ctx context.Context, fmt.Sprintf("Hello %s!", "you"))
 }
 ```
 

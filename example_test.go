@@ -2,6 +2,7 @@ package golog_test
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/vardius/golog"
 )
@@ -14,10 +15,10 @@ func ExampleNewConsoleLogger() {
 	logger.SetFlags(0)
 
 	// logger.Info won't print to the console because it is below loglevel "warn"
-	logger.Info(ctx, "%s", "Info")
+	logger.Info(ctx, fmt.Sprintf("%s", "Info"))
 	// logger.Warning and log.Error will both get printed
-	logger.Warning(ctx, "%s %d", "Warn", 1)
-	logger.Error(ctx, "%s %d", "Error", 666)
+	logger.Warning(ctx, fmt.Sprintf("%s %d", "Warn", 1))
+	logger.Error(ctx, fmt.Sprintf("%s %d", "Error", 666))
 
 	// Output:
 	// [33;1mWARN: Warn 1[0m
@@ -32,10 +33,10 @@ func ExampleNewConsoleLogger_second() {
 	logger.SetFlags(0)
 
 	// logger.Info won't print to the console because it is below loglevel "warn"
-	logger.Info(ctx, "%s", "Info")
+	logger.Info(ctx, fmt.Sprintf("%s", "Info"))
 	// logger.Warning and log.Error will both get printed
-	logger.Warning(ctx, "%s %d", "Warn", 1)
-	logger.Error(ctx, "%s %d", "Error", 666)
+	logger.Warning(ctx, fmt.Sprintf("%s %d", "Warn", 1))
+	logger.Error(ctx, fmt.Sprintf("%s %d", "Error", 666))
 
 	// Output:
 	// [33;1mWARN: Warn 1[0m
@@ -48,7 +49,7 @@ func ExampleDebug() {
 	logger.SetVerbosity(golog.Debug)
 
 	logger.SetFlags(0)
-	logger.Debug(ctx, "Hello %s!", "you")
+	logger.Debug(ctx, fmt.Sprintf("Hello %s!", "you"))
 
 	// Output:
 	// [37;1mDEBUG: Hello you![0m
@@ -60,7 +61,7 @@ func ExampleInfo() {
 	logger.SetVerbosity(golog.Info)
 
 	logger.SetFlags(0)
-	logger.Info(ctx, "Hello %s!", "you")
+	logger.Info(ctx, fmt.Sprintf("Hello %s!", "you"))
 
 	// Output:
 	// [36;1mINFO: Hello you![0m
@@ -72,7 +73,7 @@ func ExampleWarning() {
 	logger.SetVerbosity(golog.Warning)
 
 	logger.SetFlags(0)
-	logger.Warning(ctx, "Hello %s!", "you")
+	logger.Warning(ctx, fmt.Sprintf("Hello %s!", "you"))
 
 	// Output:
 	// [33;1mWARN: Hello you![0m
@@ -84,7 +85,7 @@ func ExampleError() {
 	logger.SetVerbosity(golog.Error)
 
 	logger.SetFlags(0)
-	logger.Error(ctx, "Hello %s!", "you")
+	logger.Error(ctx, fmt.Sprintf("Hello %s!", "you"))
 
 	// Output:
 	// [31;1mERROR: Hello you![0m
@@ -96,7 +97,7 @@ func ExampleCritical() {
 	logger.SetVerbosity(golog.Critical)
 
 	logger.SetFlags(0)
-	logger.Critical(ctx, "Hello %s!", "you")
+	logger.Critical(ctx, fmt.Sprintf("Hello %s!", "you"))
 
 	// Output:
 	// [31;1mFATAL: Hello you![0m
@@ -108,11 +109,11 @@ func ExampleDisable() {
 	logger.SetVerbosity(golog.Disabled)
 
 	logger.SetFlags(0)
-	logger.Debug(ctx, "Hello %s!", "you")
-	logger.Info(ctx, "Hello %s!", "you")
-	logger.Warning(ctx, "Hello %s!", "you")
-	logger.Error(ctx, "Hello %s!", "you")
-	logger.Critical(ctx, "Hello %s!", "you")
+	logger.Debug(ctx, fmt.Sprintf("Hello %s!", "you"))
+	logger.Info(ctx, fmt.Sprintf("Hello %s!", "you"))
+	logger.Warning(ctx, fmt.Sprintf("Hello %s!", "you"))
+	logger.Error(ctx, fmt.Sprintf("Hello %s!", "you"))
+	logger.Critical(ctx, fmt.Sprintf("Hello %s!", "you"))
 
 	// Output:
 	//
@@ -125,11 +126,11 @@ func ExampleDisable_second() {
 	logger.SetVerbosity(golog.Debug | golog.Info | golog.Warning | golog.Error | golog.Critical | golog.Disabled)
 
 	logger.SetFlags(0)
-	logger.Debug(ctx, "Hello %s!", "you")
-	logger.Info(ctx, "Hello %s!", "you")
-	logger.Warning(ctx, "Hello %s!", "you")
-	logger.Error(ctx, "Hello %s!", "you")
-	logger.Critical(ctx, "Hello %s!", "you")
+	logger.Debug(ctx, fmt.Sprintf("Hello %s!", "you"))
+	logger.Info(ctx, fmt.Sprintf("Hello %s!", "you"))
+	logger.Warning(ctx, fmt.Sprintf("Hello %s!", "you"))
+	logger.Error(ctx, fmt.Sprintf("Hello %s!", "you"))
+	logger.Critical(ctx, fmt.Sprintf("Hello %s!", "you"))
 
 	// Output:
 	//
@@ -143,11 +144,11 @@ func ExampleDisable_third() {
 	logger.SetVerbosity(golog.Debug | golog.Info | golog.Warning | golog.Error | golog.Critical)
 
 	logger.SetFlags(0)
-	logger.Debug(ctx, "Hello %s!", "you")
-	logger.Info(ctx, "Hello %s!", "you")
-	logger.Warning(ctx, "Hello %s!", "you")
-	logger.Error(ctx, "Hello %s!", "you")
-	logger.Critical(ctx, "Hello %s!", "you")
+	logger.Debug(ctx, fmt.Sprintf("Hello %s!", "you"))
+	logger.Info(ctx, fmt.Sprintf("Hello %s!", "you"))
+	logger.Warning(ctx, fmt.Sprintf("Hello %s!", "you"))
+	logger.Error(ctx, fmt.Sprintf("Hello %s!", "you"))
+	logger.Critical(ctx, fmt.Sprintf("Hello %s!", "you"))
 
 	// Output:
 	// [37;1mDEBUG: Hello you![0m

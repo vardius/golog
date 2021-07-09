@@ -8,65 +8,72 @@ import (
 	"google.golang.org/appengine/log"
 )
 
-type appengineLogger struct {
+type appEngineLogger struct {
 	verbosity Verbose
 }
 
-func NewAppengineLogger() Logger {
-	return &appengineLogger{DefaultVerbosity}
+func NewAppEngineLogger() Logger {
+	return &appEngineLogger{DefaultVerbosity}
 }
 
-func (l *appengineLogger) SetFlags(flag int) {}
+func (l *appEngineLogger) SetFlags(flag int) {}
 
-func (l *appengineLogger) SetVerbosity(verbosity Verbose) {
+func (l *appEngineLogger) SetVerbosity(verbosity Verbose) {
 	l.verbosity = verbosity
 }
 
-func (l *appengineLogger) Debug(ctx context.Context, format string, args ...interface{}) {
+func (l *appEngineLogger) Debug(ctx context.Context, v string) {
 	if l.verbosity&Disabled != 0 {
 		return
 	}
 	if l.verbosity&Debug != 0 {
-		log.Debugf(ctx, format, args...)
+		log.Debugf(ctx, "%s", v)
 	}
 }
 
-func (l *appengineLogger) Info(ctx context.Context, format string, args ...interface{}) {
+func (l *appEngineLogger) Info(ctx context.Context, v string) {
 	if l.verbosity&Disabled != 0 {
 		return
 	}
 	if l.verbosity&Info != 0 {
-		log.Infof(ctx, format, args...)
+		log.Infof(ctx, "%s", v)
 	}
 }
 
-func (l *appengineLogger) Warning(ctx context.Context, format string, args ...interface{}) {
+func (l *appEngineLogger) Warning(ctx context.Context, v string) {
 	if l.verbosity&Disabled != 0 {
 		return
 	}
 	if l.verbosity&Warning != 0 {
-		log.Warningf(ctx, format, args...)
+		log.Warningf(ctx, "%s", v)
 	}
 }
 
-func (l *appengineLogger) Error(ctx context.Context, format string, args ...interface{}) {
+func (l *appEngineLogger) Error(ctx context.Context, v string) {
 	if l.verbosity&Disabled != 0 {
 		return
 	}
 	if l.verbosity&Error != 0 {
-		log.Errorf(ctx, format, args...)
+		log.Errorf(ctx, "%s", v)
 	}
 }
 
-func (l *appengineLogger) Critical(ctx context.Context, format string, args ...interface{}) {
+func (l *appEngineLogger) Critical(ctx context.Context, v string) {
 	if l.verbosity&Disabled != 0 {
 		return
 	}
 	if l.verbosity&Critical != 0 {
-		log.Criticalf(ctx, format, args...)
+		log.Criticalf(ctx, "%s", v)
 	}
 }
 
+func (l *appEngineLogger) Fatal(ctx context.Context, v string) {
+	if l.verbosity&Disabled == 0 {
+		log.Criticalf(ctx, "%s", v)
+	}
+	os.Exit(1)
+}
+
 func init() {
-	New = NewAppengineLogger
+	New = NewAppEngineLogger
 }

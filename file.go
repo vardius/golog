@@ -36,47 +36,54 @@ func (l *fileLogger) SetVerbosity(verbosity Verbose) {
 	l.verbosity = verbosity
 }
 
-func (l *fileLogger) Debug(ctx context.Context, format string, args ...interface{}) {
+func (l *fileLogger) Debug(_ context.Context, v string) {
 	if l.verbosity&Disabled != 0 {
 		return
 	}
 	if l.verbosity&Debug != 0 {
-		l.logger.Printf("%s"+format, append([]interface{}{DebugPrefix}, args...)...)
+		l.logger.Printf("%s%s", DebugPrefix, v)
 	}
 }
 
-func (l *fileLogger) Info(ctx context.Context, format string, args ...interface{}) {
+func (l *fileLogger) Info(_ context.Context, v string) {
 	if l.verbosity&Disabled != 0 {
 		return
 	}
 	if l.verbosity&Info != 0 {
-		l.logger.Printf("%s"+format, append([]interface{}{InfoPrefix}, args...)...)
+		l.logger.Printf("%s%s", InfoPrefix, v)
 	}
 }
 
-func (l *fileLogger) Warning(ctx context.Context, format string, args ...interface{}) {
+func (l *fileLogger) Warning(_ context.Context, v string) {
 	if l.verbosity&Disabled != 0 {
 		return
 	}
 	if l.verbosity&Warning != 0 {
-		l.logger.Printf("%s"+format, append([]interface{}{WarnPrefix}, args...)...)
+		l.logger.Printf("%s%s", WarnPrefix, v)
 	}
 }
 
-func (l *fileLogger) Error(ctx context.Context, format string, args ...interface{}) {
+func (l *fileLogger) Error(_ context.Context, v string) {
 	if l.verbosity&Disabled != 0 {
 		return
 	}
 	if l.verbosity&Error != 0 {
-		l.logger.Printf("%s"+format, append([]interface{}{ErrorPrefix}, args...)...)
+		l.logger.Printf("%s%s", ErrorPrefix, v)
 	}
 }
 
-func (l *fileLogger) Critical(ctx context.Context, format string, args ...interface{}) {
+func (l *fileLogger) Critical(_ context.Context, v string) {
 	if l.verbosity&Disabled != 0 {
 		return
 	}
 	if l.verbosity&Critical != 0 {
-		l.logger.Printf("%s"+format, append([]interface{}{FatalPrefix}, args...)...)
+		l.logger.Printf("%s%s", CriticalPrefix, v)
 	}
+}
+
+func (l *fileLogger) Fatal(_ context.Context, v string) {
+	if l.verbosity&Disabled == 0 {
+		l.logger.Printf("%s%s", CriticalPrefix, v)
+	}
+	os.Exit(1)
 }
