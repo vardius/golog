@@ -1,0 +1,112 @@
+---
+title: The line
+description: What each part of a golog line is, how keys and values are written, groups, colour, and changing what is written with ReplaceAttr.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+Every record is one line, written with one call to the writer:
+
+```txt
+2026-10-24T09:41:07.312+11:00 INFO  /src/app/main.go:21 server started addr=:8080 tls=false
+```
+
+From left to right:
+
+| Part | What it is |
+| --- | --- |
+| Time | RFC 3339 with milliseconds, in the record's time zone. A record with a zero time has none. |
+| Level | `DEBUG`, `INFO`, `WARN`, `ERROR` or `CRITICAL`, with an offset for the levels in between, as in `INFO+2`. Shorter names are padded, so messages line up. |
+| Source | The file and line of the logging call, only with `Options.AddSource`. |
+| Message | As it is, spaces and all. |
+| Attributes | `key=value`, in the order they were added: the logger's from `With` first, then the record's. |
+
+## Values
+
+The lines on the rest of this page leave out the time, to keep them short.
+
+Each value is written by its kind, without going through `fmt` when there is a faster way:
+
+| Value | Written as |
+| --- | --- |
+| `string` | As it is, or quoted if it needs to be |
+| Integers, floats, `bool` | With `strconv`: `42`, `0.75`, `1e+21`, `true` |
+| `time.Duration` | As `Duration.String` does: `1.204s`, `350µs` |
+| `time.Time` | Like the record's time |
+| `error` | Its `Error()`, quoted if it needs to be |
+| A type with `AppendText` or `MarshalText` | That text, as for `netip.Addr` |
+| `[]byte` | Quoted |
+| A `slog.LogValuer` | Whatever its `LogValue` returns |
+| Anything else | `fmt`'s `%+v`, as `{X:1 Y:2}` |
+
+A key or value is quoted with Go's quoting rules when it is empty, or has a space, `=`, `"`, a control character,
+a character that doesn't print or invalid UTF-8 in it, so a line reads back the way it was meant:
+
+```txt
+INFO  saved path=/tmp/a.txt note="two words" empty="" err="disk full"
+```
+
+The message is not quoted for spaces of any kind, `=` or quotes. It is quoted only if it has a newline, another control
+character, a character that doesn't print, such as a bidi control, or invalid UTF-8 in it, so one record can't pass for two:
+
+```txt
+INFO  "first line\nsecond line"
+```
+
+## Groups
+
+A group's name goes before each of its keys, with a dot. It works the same whether the group comes from
+`Logger.WithGroup` or from a `slog.Group` attribute:
+
+```go
+http := logger.WithGroup("http")
+http.Info("request", "method", "GET", slog.Group("user", "id", 7))
+```
+
+```txt
+INFO  request http.method=GET http.user.id=7
+```
+
+Following slog's rules, a group with nothing in it is left out, and a group with an empty name is written
+as if its attributes weren't in a group.
+
+## Colour
+
+`Options.Color` adds ANSI escape codes for a terminal: the level in its own colour, the time, source and keys dimmed,
+and errors in red. Leave it off for files and pipes, where the codes would be noise.
+golog doesn't look at the writer to decide: the `examples/console` program shows one way to check that standard
+error is a terminal, with `os.File.Stat`.
+
+## Changing what is written
+
+`Options.ReplaceAttr` works as it does for slog's own handlers. It is called for the built-in time, level, source and
+message, and for every other attribute that isn't a group, with the names of the groups it is in. What it returns is
+written instead; the zero `slog.Attr` leaves the attribute out. Here it hides passwords and leaves out the time:
+
+```go
+replace := func(groups []string, a slog.Attr) slog.Attr {
+	switch {
+	case a.Key == "password":
+		return slog.String(a.Key, "********")
+	case a.Key == slog.TimeKey && groups == nil:
+		return slog.Attr{}
+	}
+	return a
+}
+logger := slog.New(golog.NewHandler(os.Stderr, &golog.Options{ReplaceAttr: replace}))
+```
+
+The built-ins are written in their places, without their keys, so renaming one changes nothing. A `*slog.Source`
+returned for the source is written as `file:line`; to show only the file's name:
+
+```go
+if src, ok := a.Value.Any().(*slog.Source); ok && a.Key == slog.SourceKey {
+	src.File = filepath.Base(src.File)
+}
+```
+
+<Aside title="What ReplaceAttr costs">
+Without `ReplaceAttr`, golog writes the built-ins straight from the record and allocates nothing. With it, each one is
+handed over as a `slog.Attr`: a negative level such as Debug then costs an allocation to box, and with `AddSource`
+the `*slog.Source` costs three.
+</Aside>

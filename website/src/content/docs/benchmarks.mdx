@@ -1,0 +1,75 @@
+---
+title: Benchmarks
+description: What a golog record costs, how it compares with slog's own handlers and with v1, and how to measure it yourself.
+---
+
+import { Aside, Tabs, TabItem } from '@astrojs/starlight/components';
+import BenchmarkChart from '../../components/BenchmarkChart.astro';
+import BenchmarkSuite from '../../components/BenchmarkSuite.astro';
+import { baselines, comparison, suite } from '../../data/benchmarks';
+
+These numbers measure the logger and its handler alone: every one of them writes to a writer that drops its input,
+so no time goes to a terminal or a disk. A real write costs more than any of these records, but it costs the same
+whichever handler made the line.
+
+Each record is one request's worth of attributes: a method, a path, a status, a duration and a size, with a remote
+address, a bool, a float, an error and a user agent for ten. "Groups" is a logger with two attributes from `With` and
+a `WithGroup`, and a record with a group of five.
+
+## Against slog's own handlers and v1
+
+All of them ran on the same harness, with the same values. slog's handlers and golog are measured through a
+`*slog.Logger` with `LogAttrs`. v1 takes a string, so its benchmark formats the same `key=value` pairs into the message
+with `fmt.Sprintf`, as its callers had to. v1's console logger colours every line, so it is compared with golog in
+colour; slog's handlers have no colour, so they are compared with golog without.
+
+<Tabs syncKey="baseline">
+<TabItem label="TextHandler">
+<BenchmarkChart title="Time per record" rows={comparison.text} labels={baselines.text} />
+</TabItem>
+<TabItem label="JSONHandler">
+<BenchmarkChart title="Time per record" rows={comparison.json} labels={baselines.json} />
+</TabItem>
+<TabItem label="v1">
+<BenchmarkChart title="Time per record" rows={comparison.v1} labels={baselines.v1} />
+</TabItem>
+</Tabs>
+
+## Where the time goes
+
+A `*slog.Logger` does its own work on every record before any handler sees it: it reads the clock and looks up the
+caller, so that a handler can print the source. With a handler that does nothing, that is about 130 ns here: most of
+the time of a short record, whichever handler gets it. v1 only reads the clock, which is why it is quicker for a short
+record from one goroutine. What golog adds on top is less than slog's handlers add, and allocates nothing.
+
+With many goroutines logging at once, the records are formatted in parallel and only the write waits for the lock.
+In the 16-goroutine rows, the time is wall time per record across all of them, so it measures throughput, not how
+long one call takes. Below the level, a record is dropped before any of its values are formatted; v1's callers had already paid for
+`fmt.Sprintf` by then, and its allocations.
+
+## v2's own suite
+
+<BenchmarkSuite rows={suite} />
+
+<Aside title="Where the allocations go">
+Once its buffers are warm, golog allocates nothing for a record. The allocation in the ten-attribute row is the
+`*slog.Logger`'s: a `slog.Record` holds five attributes and allocates for more, whatever its handler.
+Values written with `fmt`, for types with no `AppendText`, `MarshalText` or `Error` method, allocate in `fmt`.
+</Aside>
+
+## Run them yourself
+
+From a clone of the repository:
+
+```sh
+go test -run '^$' -bench . -benchmem
+```
+
+To compare two versions, run each a few times and compare with [benchstat](https://pkg.go.dev/golang.org/x/perf/cmd/benchstat):
+
+```sh
+go test -run '^$' -bench . -count 10 > new.txt
+benchstat old.txt new.txt
+```
+
+The allocation counts are also enforced by tests: `TestAllocations` fails if a record allocates more than it should.

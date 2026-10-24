@@ -1,0 +1,85 @@
+---
+title: Levels
+description: Setting the minimum level, changing it while the program runs, and golog's CRITICAL level.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+`Options.Level` is the lowest level the handler logs. It is a `slog.Leveler`, so it can be a fixed `slog.Level`
+or a `*slog.LevelVar` that changes. Left nil, it is `slog.LevelInfo`, as for slog's own handlers.
+
+```go
+h := golog.NewHandler(os.Stderr, &golog.Options{Level: slog.LevelDebug})
+```
+
+A record below the level is dropped by the logger before any of its values are formatted. Dropping a Debug record with
+five attributes costs a few nanoseconds and allocates nothing.
+
+## Changing the level while running
+
+Pass a `*slog.LevelVar` and set it whenever you like, from any goroutine. The handler reads it on every record,
+and so do the handlers derived from it with `With` and `WithGroup`:
+
+```go
+var level slog.LevelVar // Info until it is set
+logger := slog.New(golog.NewHandler(os.Stderr, &golog.Options{Level: &level}))
+
+// Later, from any goroutine, while others log:
+level.Set(slog.LevelDebug)
+```
+
+## The levels
+
+| Level | Value | Written as |
+| --- | --- | --- |
+| `slog.LevelDebug` | -4 | `DEBUG` |
+| `slog.LevelInfo` | 0 | `INFO` |
+| `slog.LevelWarn` | 4 | `WARN` |
+| `slog.LevelError` | 8 | `ERROR` |
+| `golog.LevelCritical` | 12 | `CRITICAL` |
+
+A level between two of these is written as the one below it and the difference, as slog does: `INFO+2`, `ERROR+1`.
+
+## Critical
+
+`golog.LevelCritical` is v1's Critical: a failure that needs someone now, above an error. Log at it with `Log`:
+
+```go
+logger.Log(ctx, golog.LevelCritical, "disk full", "path", "/var/lib/db")
+```
+
+```txt
+2026-10-24T09:41:07.312+11:00 CRITICAL disk full path=/var/lib/db
+```
+
+slog's own handlers write it as `ERROR+4`. If the same records also go to one of them, `ReplaceAttr` can name it:
+
+```go
+ReplaceAttr: func(groups []string, a slog.Attr) slog.Attr {
+	if a.Key == slog.LevelKey && groups == nil && a.Value.Any() == golog.LevelCritical {
+		return slog.String(a.Key, "CRITICAL")
+	}
+	return a
+},
+```
+
+<Aside title="There is no Fatal">
+v1's `Fatal` logged and then exited. slog has no such level, and golog doesn't exit for you:
+log at `golog.LevelCritical`, then call `os.Exit(1)` where your program decides to stop.
+</Aside>
+
+## Coming from v1's verbosity bits
+
+v1's verbosity was a set of levels, such as `golog.Warning | golog.Error`. slog's is a minimum: everything at the
+level and above is logged. Most sets were "this level and up", which is the level itself:
+
+| v1 | v2 |
+| --- | --- |
+| `golog.DefaultVerbosity`, every level | `slog.LevelDebug` |
+| `golog.Info \| golog.Warning \| golog.Error \| golog.Critical` | `slog.LevelInfo` |
+| `golog.Warning \| golog.Error \| golog.Critical` | `slog.LevelWarn` |
+| `golog.Error \| golog.Critical` | `slog.LevelError` |
+| `golog.Critical` | `golog.LevelCritical` |
+| `golog.Disabled` | `slog.DiscardHandler` in place of the handler |
+
+A set with a gap in it, such as Debug alone, needs a handler of your own around golog's that decides in `Enabled`.

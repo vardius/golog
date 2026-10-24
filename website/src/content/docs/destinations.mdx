@@ -1,0 +1,60 @@
+---
+title: Where logs go
+description: Logging to a file, to a terminal and a file at once, as JSON for machines, and with values from a context.
+---
+
+import { Code } from '@astrojs/starlight/components';
+import fileExample from '../../../../examples/file/main.go?raw';
+import requestidExample from '../../../../examples/requestid/main.go?raw';
+
+golog writes to any `io.Writer`. Each record is one `Write` call, under a lock that the handler shares with every
+handler made from it by `With` and `WithGroup`, so lines from different goroutines never mix.
+
+## A file
+
+Open the file yourself, handle the error, and hand it over. Leave `Color` off: escape codes in a file are noise.
+
+```go
+f, err := os.OpenFile("app.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0o644)
+if err != nil {
+	return fmt.Errorf("open log: %w", err)
+}
+defer f.Close()
+
+logger := slog.New(golog.NewHandler(f, nil))
+```
+
+If a write fails, the handler's `Handle` returns the error. `*slog.Logger` discards it, as it does for every handler;
+to act on it, wrap the handler and check what `Handle` returns.
+
+## A terminal and a file at once
+
+`slog.NewMultiHandler` sends each record to several handlers, each with its own level and options.
+This program logs Info and up to the terminal in colour, and everything to a file:
+
+<Code code={fileExample} lang="go" title="examples/file/main.go" />
+
+## JSON for machines
+
+golog writes for people. Where a program reads the logs, such as a log collector, use slog's JSON handler, alone or
+next to golog's with `slog.NewMultiHandler`:
+
+```go
+logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
+```
+
+This is also what replaces v1's App Engine logger. If the platform that collects the logs asks for other field names,
+for the level say, rename them with `ReplaceAttr`.
+
+## Values from a context
+
+slog hands the context passed to `InfoContext` and its siblings to the handler. golog's handler doesn't read it:
+what to take from a context is up to the program. A small handler around golog's can add it to each record.
+This one adds the request ID that an HTTP middleware put in the request's context:
+
+<Code code={requestidExample} lang="go" title="examples/requestid/main.go" />
+
+```txt
+2026-10-24T09:41:07.312+11:00 DEBUG saying hello request_id=1
+2026-10-24T09:41:07.312+11:00 INFO  served method=GET path=/hello took=61.2µs request_id=1
+```

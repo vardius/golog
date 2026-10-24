@@ -1,0 +1,83 @@
+---
+title: Getting started
+description: Install golog, give a slog.Logger its handler, and see what the lines look like.
+---
+
+import { Code, LinkCard, CardGrid, Steps } from '@astrojs/starlight/components';
+import program from '../../../../examples/console/main.go?raw';
+
+golog is a handler for the standard library's [`log/slog`](https://pkg.go.dev/log/slog). You log with a
+`*slog.Logger`, as you would with slog's own handlers, and golog writes each record as one line for people to read:
+
+```txt
+2026-10-24T09:41:07.312+11:00 INFO  server started addr=:8080
+2026-10-24T09:41:09.004+11:00 WARN  slow request http.method=GET http.path=/search http.took=1.204s
+2026-10-24T09:41:12.871+11:00 ERROR payment failed order=1042 err="card declined"
+```
+
+## Install
+
+golog needs Go 1.26 or newer.
+
+```sh
+go get github.com/vardius/golog/v2
+```
+
+## Your first logger
+
+```go
+logger := slog.New(golog.NewHandler(os.Stderr, &golog.Options{Color: true}))
+logger.Info("server started", "addr", ":8080")
+```
+
+`NewHandler` takes the writer for the lines and the options; `nil` options log Info and above, without colour.
+To make it the logger behind `slog.Info` and the other package functions, pass it to `slog.SetDefault`.
+
+## A whole program
+
+This program logs a few records the way a server would, in colour when standard error is a terminal:
+
+<Code code={program} lang="go" title="examples/console/main.go" />
+
+## Run it
+
+<Steps>
+
+1. From a clone of the repository, run it in a terminal:
+
+   ```sh
+   go run ./examples/console
+   ```
+
+   Four lines, with the levels in colour and the time and keys dimmed.
+
+2. Add `-debug` to log Debug records too:
+
+   ```sh
+   go run ./examples/console -debug
+   ```
+
+3. Send the lines to a file instead. Standard error isn't a terminal now, so there's no colour:
+
+   ```sh
+   go run ./examples/console 2> app.log
+   cat app.log
+   ```
+
+</Steps>
+
+## What just happened
+
+- `golog.NewHandler` made a `slog.Handler`, and `slog.New` a logger around it. Everything else is slog's API.
+- Each value came after its key, and came out as `key=value`. `"card declined"` is quoted because it has a space in it.
+- `WithGroup("http")` put `http.` before the keys that followed it.
+- With `-debug` unset, the Debug record was dropped before any of its values were formatted.
+
+## Next steps
+
+<CardGrid>
+	<LinkCard title="The line" href="../output/" description="What each part of a line is, how values are written, and colour." />
+	<LinkCard title="Levels" href="../levels/" description="The minimum level, changing it while running, and CRITICAL." />
+	<LinkCard title="Where logs go" href="../destinations/" description="Files, two places at once, JSON for machines, values from a context." />
+	<LinkCard title="Benchmarks" href="../benchmarks/" description="What a record costs, against v1 and slog's own handlers." />
+</CardGrid>
