@@ -2,158 +2,65 @@ package golog_test
 
 import (
 	"context"
-	"fmt"
+	"errors"
+	"log/slog"
+	"os"
 
-	"github.com/vardius/golog"
+	"github.com/vardius/golog/v2"
 )
 
-func ExampleNewConsoleLogger() {
-	ctx := context.Background()
-	logger := golog.NewConsoleLogger()
-	logger.SetVerbosity(golog.Warning | golog.Error)
-
-	logger.SetFlags(0)
-
-	// logger.Info won't print to the console because it is below loglevel "warn"
-	logger.Info(ctx, fmt.Sprintf("%s", "Info"))
-	// logger.Warning and log.Error will both get printed
-	logger.Warning(ctx, fmt.Sprintf("%s %d", "Warn", 1))
-	logger.Error(ctx, fmt.Sprintf("%s %d", "Error", 666))
-
-	// Output:
-	// [33;1mWARN: Warn 1[0m
-	// [31;1mERROR: Error 666[0m
+// withoutTime leaves the time out, so the output below doesn't change from run to run.
+func withoutTime(groups []string, a slog.Attr) slog.Attr {
+	if a.Key == slog.TimeKey && groups == nil {
+		return slog.Attr{}
+	}
+	return a
 }
 
-func ExampleNewConsoleLogger_second() {
-	ctx := context.Background()
-	logger := golog.NewConsoleLogger()
-	logger.SetVerbosity(golog.Warning | golog.Error)
+func ExampleNewHandler() {
+	logger := slog.New(golog.NewHandler(os.Stdout, &golog.Options{ReplaceAttr: withoutTime}))
 
-	logger.SetFlags(0)
+	logger.Info("server started", "addr", ":8080", "tls", false)
+	logger.Error("payment failed", "order", 1042, "err", errors.New("card declined"))
 
-	// logger.Info won't print to the console because it is below loglevel "warn"
-	logger.Info(ctx, fmt.Sprintf("%s", "Info"))
-	// logger.Warning and log.Error will both get printed
-	logger.Warning(ctx, fmt.Sprintf("%s %d", "Warn", 1))
-	logger.Error(ctx, fmt.Sprintf("%s %d", "Error", 666))
-
+	// Attributes from With are formatted once; a group's name qualifies the keys after it.
+	requests := logger.With("service", "api").WithGroup("http")
+	requests.Warn("slow request", "method", "GET", "path", "/search", "ms", 1204)
 	// Output:
-	// [33;1mWARN: Warn 1[0m
-	// [31;1mERROR: Error 666[0m
+	// INFO  server started addr=:8080 tls=false
+	// ERROR payment failed order=1042 err="card declined"
+	// WARN  slow request service=api http.method=GET http.path=/search http.ms=1204
 }
 
-func ExampleDebug() {
-	ctx := context.Background()
-	logger := golog.New()
-	logger.SetVerbosity(golog.Debug)
+func ExampleOptions_level() {
+	level := new(slog.LevelVar) // Info until it is set
+	logger := slog.New(golog.NewHandler(os.Stdout, &golog.Options{Level: level, ReplaceAttr: withoutTime}))
 
-	logger.SetFlags(0)
-	logger.Debug(ctx, fmt.Sprintf("Hello %s!", "you"))
-
+	logger.Debug("not written")
+	level.Set(slog.LevelDebug) // safe while other goroutines log
+	logger.Debug("cache miss", "key", "user:42")
 	// Output:
-	// [37;1mDEBUG: Hello you![0m
+	// DEBUG cache miss key=user:42
 }
 
-func ExampleInfo() {
-	ctx := context.Background()
-	logger := golog.New()
-	logger.SetVerbosity(golog.Info)
+func ExampleLevelCritical() {
+	logger := slog.New(golog.NewHandler(os.Stdout, &golog.Options{ReplaceAttr: withoutTime}))
 
-	logger.SetFlags(0)
-	logger.Info(ctx, fmt.Sprintf("Hello %s!", "you"))
-
+	logger.Log(context.Background(), golog.LevelCritical, "disk full", "path", "/var/lib/db", "free", 0)
 	// Output:
-	// [36;1mINFO: Hello you![0m
+	// CRITICAL disk full path=/var/lib/db free=0
 }
 
-func ExampleWarning() {
-	ctx := context.Background()
-	logger := golog.New()
-	logger.SetVerbosity(golog.Warning)
+func ExampleOptions_replaceAttr() {
+	redact := func(groups []string, a slog.Attr) slog.Attr {
+		if a.Key == "password" {
+			return slog.String(a.Key, "********")
+		}
+		return withoutTime(groups, a)
+	}
+	logger := slog.New(golog.NewHandler(os.Stdout, &golog.Options{ReplaceAttr: redact}))
 
-	logger.SetFlags(0)
-	logger.Warning(ctx, fmt.Sprintf("Hello %s!", "you"))
-
+	logger.Info("signed in", slog.Group("user", "name", "ada", "password", "hunter2"))
 	// Output:
-	// [33;1mWARN: Hello you![0m
-}
-
-func ExampleError() {
-	ctx := context.Background()
-	logger := golog.New()
-	logger.SetVerbosity(golog.Error)
-
-	logger.SetFlags(0)
-	logger.Error(ctx, fmt.Sprintf("Hello %s!", "you"))
-
-	// Output:
-	// [31;1mERROR: Hello you![0m
-}
-
-func ExampleCritical() {
-	ctx := context.Background()
-	logger := golog.New()
-	logger.SetVerbosity(golog.Critical)
-
-	logger.SetFlags(0)
-	logger.Critical(ctx, fmt.Sprintf("Hello %s!", "you"))
-
-	// Output:
-	// [31;1mFATAL: Hello you![0m
-}
-
-func ExampleDisable() {
-	ctx := context.Background()
-	logger := golog.New()
-	logger.SetVerbosity(golog.Disabled)
-
-	logger.SetFlags(0)
-	logger.Debug(ctx, fmt.Sprintf("Hello %s!", "you"))
-	logger.Info(ctx, fmt.Sprintf("Hello %s!", "you"))
-	logger.Warning(ctx, fmt.Sprintf("Hello %s!", "you"))
-	logger.Error(ctx, fmt.Sprintf("Hello %s!", "you"))
-	logger.Critical(ctx, fmt.Sprintf("Hello %s!", "you"))
-
-	// Output:
-	//
-}
-
-func ExampleDisable_second() {
-	ctx := context.Background()
-
-	logger := golog.New()
-	logger.SetVerbosity(golog.Debug | golog.Info | golog.Warning | golog.Error | golog.Critical | golog.Disabled)
-
-	logger.SetFlags(0)
-	logger.Debug(ctx, fmt.Sprintf("Hello %s!", "you"))
-	logger.Info(ctx, fmt.Sprintf("Hello %s!", "you"))
-	logger.Warning(ctx, fmt.Sprintf("Hello %s!", "you"))
-	logger.Error(ctx, fmt.Sprintf("Hello %s!", "you"))
-	logger.Critical(ctx, fmt.Sprintf("Hello %s!", "you"))
-
-	// Output:
-	//
-}
-
-func ExampleDisable_third() {
-	ctx := context.Background()
-
-	// do not disable logger
-	logger := golog.New()
-	logger.SetVerbosity(golog.Debug | golog.Info | golog.Warning | golog.Error | golog.Critical)
-
-	logger.SetFlags(0)
-	logger.Debug(ctx, fmt.Sprintf("Hello %s!", "you"))
-	logger.Info(ctx, fmt.Sprintf("Hello %s!", "you"))
-	logger.Warning(ctx, fmt.Sprintf("Hello %s!", "you"))
-	logger.Error(ctx, fmt.Sprintf("Hello %s!", "you"))
-	logger.Critical(ctx, fmt.Sprintf("Hello %s!", "you"))
-
-	// Output:
-	// [37;1mDEBUG: Hello you![0m
-	// [36;1mINFO: Hello you![0m
-	// [33;1mWARN: Hello you![0m
-	// [31;1mERROR: Hello you![0m
-	// [31;1mFATAL: Hello you![0m
+	// INFO  signed in user.name=ada user.password=********
 }

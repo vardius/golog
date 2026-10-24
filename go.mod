@@ -1,5 +1,3 @@
-module github.com/vardius/golog
+module github.com/vardius/golog/v2
 
-go 1.12
-
-require google.golang.org/appengine v1.6.1
+go 1.26.0
